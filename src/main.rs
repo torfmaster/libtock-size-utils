@@ -1,22 +1,21 @@
-use clap::{App, Arg};
 use elf::File;
 use std::path::Path;
+use structopt::StructOpt;
+
+#[derive(Debug, StructOpt)]
+#[structopt(
+    name = "libtock size tool",
+    about = "A simple app to measure the size of userland binaries"
+)]
+struct Arguments {
+    #[structopt(short, long)]
+    input: String,
+}
 
 fn main() {
-    let matches = App::new("size tools")
-        .arg(
-            Arg::with_name("input")
-                .long("input")
-                .short("i")
-                .takes_value(true)
-                .required(true),
-        )
-        .get_matches();
-    let input = matches
-        .value_of("input")
-        .expect("argument for input not found");
+    let arguments = Arguments::from_args();
 
-    let path = Path::new(input);
+    let path = Path::new(&arguments.input);
     let file = File::open_path(path).expect("file not found");
     let text_size = file
         .get_section(".text")
